@@ -10,16 +10,12 @@ use ReflectionClass;
 
 class Woody extends Parser
 {
-    public $parsedMail;
-    public $arfMail;
-
     /**
      * Create a new Blocklistde instance
      */
     public function __construct($parsedMail, $arfMail)
     {
-        $this->parsedMail = $parsedMail;
-        $this->arfMail = $arfMail;
+        parent::__construct($parsedMail, $arfMail);
     }
 
     /**
@@ -40,56 +36,37 @@ class Woody extends Parser
             config("{$this->configBase}.parser.name")
         );
 
-        $events = [ ];
-
         $this->feedName = 'default';
 
-        if (!$this->isKnownFeed()) {
-            return $this->failed(
-                "Detected feed {$this->feedName} is unknown."
-            );
+        if ($this->isKnownFeed() && $this->isEnabledFeed() && $this->hasArfMail()) {
+            preg_match_all('/([\w\-]+): (.*)[ ]*\r?\n/', $this->arfMail['report'], $regs);
+            $report = array_combine($regs[1], $regs[2]);
+
+            if ($this->hasRequiredFields($report) === true) {
+                // Event has all requirements met, filter and add!
+                if ($report['Feedback-Type'] != 'abuse') {
+                    return $this->failed(
+                        "Unabled to detect the report type from this notifier"
+                    );
+                }
+
+                $report = $this->applyFilters($report);
+
+                $report['evidence'] = $this->arfMail['evidence'];
+
+                $this->events[] = [
+                    'source'        => config("{$this->configBase}.parser.name"),
+                    'ip'            => $report['Source-IP'],
+                    'domain'        => false,
+                    'uri'           => false,
+                    'class'         => config("{$this->configBase}.feeds.{$this->feedName}.class"),
+                    'type'          => config("{$this->configBase}.feeds.{$this->feedName}.type"),
+                    'timestamp'     => strtotime($report['Received-Date']),
+                    'information'   => json_encode($report),
+                ];
+            }
         }
 
-        if (!$this->isEnabledFeed()) {
-            return $this->success($events);
-        }
-
-        if ($this->arfMail === false) {
-            return $this->failed("Detected feed '{$this->feedName}' should be ARF, but received plain message.");
-        }
-
-        preg_match_all('/([\w\-]+): (.*)[ ]*\r?\n/', $this->arfMail['report'], $regs);
-        $report = array_combine($regs[1], $regs[2]);
-
-        if (!$this->hasRequiredFields($report)) {
-            return $this->failed(
-                "Required field {$this->requiredField} is missing or the config is incorrect."
-            );
-        }
-
-        $report = $this->applyFilters($report);
-
-        if ($report['Feedback-Type'] != 'abuse') {
-            return $this->failed(
-                "Unabled to detect the report type from this notifier"
-            );
-        }
-
-        $report['evidence'] = $this->arfMail['evidence'];
-
-        $event = [
-            'source'        => config("{$this->configBase}.parser.name"),
-            'ip'            => $report['Source-IP'],
-            'domain'        => false,
-            'uri'           => false,
-            'class'         => config("{$this->configBase}.feeds.{$this->feedName}.class"),
-            'type'          => config("{$this->configBase}.feeds.{$this->feedName}.type"),
-            'timestamp'     => strtotime($report['Received-Date']),
-            'information'   => json_encode($report),
-        ];
-
-        $events[] = $event;
-
-        return $this->success($events);
+        return $this->success();
     }
 }
