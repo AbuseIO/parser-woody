@@ -9,7 +9,7 @@ use Ddeboer\DataImport\Filter;
 class Woody extends Parser
 {
     /**
-     * Create a new Blocklistde instance
+     * Create a new Woody instance
      */
     public function __construct($parsedMail, $arfMail)
     {
