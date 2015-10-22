@@ -2,10 +2,6 @@
 
 namespace AbuseIO\Parsers;
 
-use Ddeboer\DataImport\Reader;
-use Ddeboer\DataImport\Writer;
-use Ddeboer\DataImport\Filter;
-
 class Woody extends Parser
 {
     /**
@@ -60,3 +56,4 @@ class Woody extends Parser
         return $this->success();
     }
 }
+
