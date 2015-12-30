@@ -2,10 +2,17 @@
 
 namespace AbuseIO\Parsers;
 
+/**
+ * Class Woody
+ * @package AbuseIO\Parsers
+ */
 class Woody extends Parser
 {
     /**
      * Create a new Woody instance
+     *
+     * @param \PhpMimeMailParser\Parser $parsedMail phpMimeParser object
+     * @param array $arfMail array with ARF detected results
      */
     public function __construct($parsedMail, $arfMail)
     {
@@ -14,7 +21,7 @@ class Woody extends Parser
 
     /**
      * Parse attachments
-     * @return Array    Returns array with failed or success data
+     * @return array    Returns array with failed or success data
      *                  (See parser-common/src/Parser.php) for more info.
      */
     public function parse()
@@ -56,4 +63,3 @@ class Woody extends Parser
         return $this->success();
     }
 }
-
