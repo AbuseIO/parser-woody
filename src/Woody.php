@@ -1,6 +1,7 @@
 <?php
 
 namespace AbuseIO\Parsers;
+
 use AbuseIO\Models\Incident;
 
 /**
@@ -34,7 +35,7 @@ class Woody extends Parser
                 $report = array_combine($regs[1], $regs[2]);
 
                 if ($this->hasRequiredFields($report) === true) {
-                    // Event has all requirements met, filter and add!
+                    // incident has all requirements met, filter and add!
                     if ($report['Feedback-Type'] != 'abuse') {
                         return $this->failed(
                             "Unabled to detect the report type from this notifier"
@@ -56,7 +57,7 @@ class Woody extends Parser
                     $incident->timestamp   = strtotime($report['Received-Date']);
                     $incident->information = json_encode($report);
 
-                    $this->events[] = $incident;
+                    $this->incidents[] = $incident;
 
                 }
             } else {
