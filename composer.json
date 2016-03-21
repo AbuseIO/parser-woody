@@ -1,7 +1,7 @@
 {
     "name": "abuseio/parser-woody",
     "description": "Parser addon for handling notifications from woody",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "keywords": ["laravel", "abuseio", "parser", "woody"],
     "homepage": "http://abuse.io",
     "type": "library",
@@ -29,5 +29,8 @@
         "psr-4": {
             "AbuseIO\\Parser\\Woody\\": "src/"
         }
+    },
+    "suggest": {
+        "abuseio/parser-arf", "This package replaces the package you are trying to install"
     }
 }
